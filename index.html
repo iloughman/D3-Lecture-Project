@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+	<head>
+		<script src="d3.min.js"></script>
+	</head>
+	<style>
+		body {
+			font: 10px;
+		}
+
+		.axis path, .axis line {
+			fill: none;
+			stroke-width: 1;
+			stroke: #000;
+		}
+
+		.line {
+			fill: none;
+			stroke: steelblue;
+			stroke-width: 2px;
+			shape-rendering: crispEdges;
+		}
+	</style>
+	<body>
+
+		<script>
+
+		// var width = 1200, height = 600;
+
+		// var svg = d3.select('body').append('svg')
+		// 	.attr('width', width)
+		// 	.attr('height', height+100)
+		// 	.append('g')
+		// 	.attr('transform', 'translate(80,20)')
+
+		// var xScale = d3.time.scale()
+		// 	.range([0, 800])
+
+		// var yScale = d3.scale.linear()
+		// 	.range([height, 0])
+
+		// var line = d3.svg.line()
+		// 	.x(function(d) {return xScale(d.date); })
+		// 	.y(function(d) {return yScale(d.capacity); })
+
+		// var parseDate = d3.time.format("%Y-%m").parse;
+
+		// var xAxis = d3.svg.axis()
+		// 	.scale(xScale)
+		// 	.orient('bottom')
+
+		// var yAxis = d3.svg.axis()
+		// 	.scale(yScale)
+		// 	.orient('left')
+
+		// d3.csv("/capacities.csv")
+		// 	.row(function(d){return {capacity: d.SHA, date: d.date}})
+		// 	.get(function(err, rows) {
+		// 		if (err) throw err;
+
+		// 		rows.forEach(function(d){
+		// 			d.date = parseDate(d.date);
+		// 			d.capacity = +d.capacity/4552100;
+		// 		})
+
+		// 		xScale.domain(d3.extent(rows, function(d) {return d.date}))
+		// 		yScale.domain([0, d3.max(rows, function(d) {return d.capacity})])
+
+		// 		console.log("after", rows);
+
+		// 		svg.append('g')
+		// 			.attr('class', 'x axis')
+		// 			.attr('transform', 'translate(0,'+ height + ')')
+		// 			.call(xAxis)
+
+		// 		svg.append('g')
+		// 			.attr('class', 'y axis')
+		// 			.call(yAxis)
+
+		// 		svg.append("path")
+		// 			.datum(rows)
+		// 			.attr("class", "line")
+		// 			.attr("d", function(d) {return line(d)})
+
+
+		// 	})
+
+		// SVG
+		var width = 800, height = 400;
+		var svg = d3.select('body').append('svg')
+					.attr('width', width)
+					.attr('height', height+50)
+					.append('g')
+					.attr('transform', 'translate(80,20)')
+
+		// Scale Functions
+		var xScale = d3.time.scale()
+				.range([0,600])
+		var yScale = d3.scale.linear()
+				.range([height, 0])
+
+		// Axis Functions
+		var xAxis = d3.svg.axis()
+				.scale(xScale)
+				.orient('bottom')
+
+		var yAxis = d3.svg.axis()
+				.scale(yScale)
+				.orient('left')
+
+		// Line Generator
+		var lineFunction = d3.svg.line()
+				.x(function(d){return xScale(d.date)})
+				.y(function(d){return yScale(d.capacity)})
+				.interpolate('basis')
+
+		// Date Parse Function
+		var parseDate = d3.time.format('%Y-%m').parse
+
+		// Load Data
+		d3.csv('capacities2.csv')
+			.row(function(d) {return {capacity: d.SHA , date: d.date}})
+			.get(function(err, table){
+				
+				table.forEach(function(row){
+					row.capacity = +row.capacity/4552100;
+					row.date = parseDate(row.date);
+				})
+
+				xScale.domain(d3.extent(table, function(d) {return d.date}))
+				yScale.domain([0,d3.max(table, function(d) {return d.capacity})])
+
+				svg.append('g')
+					.attr('class', 'x axis')
+					.attr('transform', 'translate(0,'+height+')')
+					.call(xAxis)
+
+				svg.append('g')
+					.attr('class', 'y axis')
+					.call(yAxis)
+
+				svg.append('path')
+					.datum(table)
+					.attr('d', function(d) {return lineFunction(d)})
+					.attr('class', 'line')
+
+
+			})
+
+		</script>
+	</body>
+
