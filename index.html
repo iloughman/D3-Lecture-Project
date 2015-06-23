@@ -26,7 +26,11 @@
 
 		<script>
 
-		// SVG
+		// SHA - Lake Shasta - Total Capacity = 4552100 acre-ft
+		// CSI - Lake Casitas - Total Capacity = 254000 acre-ft
+		// DMV - Diamond Valley Lake - Total Capacity = 800000 acre-ft
+
+		// Start with this
 		var width = 800, height = 400;
 		var svg = d3.select('body').append('svg')
 					.attr('width', width)
@@ -34,13 +38,12 @@
 					.append('g')
 					.attr('transform', 'translate(80,20)')
 
-		// Scale Functions
 		var xScale = d3.time.scale()
-				.range([0,600])
+				.range([0, 600])
+
 		var yScale = d3.scale.linear()
 				.range([height, 0])
 
-		// Axis Functions
 		var xAxis = d3.svg.axis()
 				.scale(xScale)
 				.orient('bottom')
@@ -49,27 +52,25 @@
 				.scale(yScale)
 				.orient('left')
 
-		// Line Generator
 		var lineFunction = d3.svg.line()
 				.x(function(d){return xScale(d.date)})
 				.y(function(d){return yScale(d.capacity)})
-				.interpolate('basis')
+				.interpolate('monotone')
 
-		// Date Parse Function
 		var parseDate = d3.time.format('%Y-%m').parse
 
-		// Load Data
+
 		d3.csv('capacities2.csv')
-			.row(function(d) {return {capacity: d.SHA , date: d.date}})
+			.row(function(d){return {capacity: d.CSI, date: d.date}})
 			.get(function(err, table){
 				
 				table.forEach(function(row){
-					row.capacity = +row.capacity/4552100;
+					row.capacity = row.capacity/254000;
 					row.date = parseDate(row.date);
 				})
 
-				xScale.domain(d3.extent(table, function(d) {return d.date}))
-				yScale.domain([0,d3.max(table, function(d) {return d.capacity})])
+				xScale.domain(d3.extent(table, function(d){return d.date}))
+				yScale.domain([0, d3.max(table, function(d){return d.capacity})])
 
 				svg.append('g')
 					.attr('class', 'x axis')
@@ -82,12 +83,14 @@
 
 				svg.append('path')
 					.datum(table)
-					.attr('d', function(d) {return lineFunction(d)})
+					.attr('d', function(d){return lineFunction(d)})
 					.attr('class', 'line')
-
 
 			})
 
+
 		</script>
 	</body>
+
+</html>
 
